@@ -12,6 +12,10 @@ Download mysql for windows: https://dev.mysql.com/downloads/installer/
 
 `pip install mysql-connector-python`
 
+cd backend   pip install mysql-connector-python flask  python server.py
+
+starting the frontend   index.html   live server
+
 ### Exercise 
 
 The grocery management system that we built is functional but after we give it to users for use, we got following feedback. The exercise for you to address this feedback and implement these features in the application,
