@@ -52,6 +52,16 @@ def insert_order():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+@app.route('/editProduct', methods=['PUT'])
+def edit_product():
+    request_payload = json.loads(request.form['data'])
+    updated_id = products_dao.update_product(connection, request_payload)
+    response = jsonify({
+        'updated_id': updated_id
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 @app.route('/deleteProduct', methods=['POST'])
 def delete_product():
     return_id = products_dao.delete_product(connection, request.form['product_id'])
