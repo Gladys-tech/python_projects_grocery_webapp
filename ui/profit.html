@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profit Summary</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-image: url('./images/bg.jpg');
+            background-size: cover;
+            padding-top: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .profit-card {
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        .profit-label {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .profit-value {
+            font-size: 1.5rem;
+            color: #28a745;
+        }
+
+        .filter-select {
+            max-width: 250px;
+        }
+
+        .header-title {
+            font-weight: bold;
+            font-size: 1.75rem;
+            color: #333;
+        }
+
+        .btn-calculate {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            background-color: #2196f3;
+        }
+
+        @media (max-width: 576px) {
+            .profit-value {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h2 class="header-title">Profit Summary</h2>
+
+            <select id="profitFilter" class="form-select filter-select">
+                <option value="daily">Today</option>
+                <option value="weekly">This Week</option>
+                <option value="monthly">This Month</option>
+                <option value="yearly">This Year</option>
+            </select>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="profit-card text-center">
+                    <div class="profit-label">Total Selling Price</div>
+                    <div id="totalSelling" class="profit-value">UGX 0</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="profit-card text-center">
+                    <div class="profit-label">Total Buying Cost</div>
+                    <div id="totalBuying" class="profit-value text-danger">UGX 0</div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="profit-card text-center">
+                    <div class="profit-label">Expenses</div>
+                    <div id="totalExpenses" class="profit-value text-warning">UGX 0</div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="profit-card text-center">
+                    <div class="profit-label">Net Profit</div>
+                    <div id="netProfit" class="profit-value">UGX 0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-end mt-4">
+            <button class="btn btn-calculate" onclick="calculateProfit()">Calculate</button>
+        </div>
+    </div>
+
+    <script>
+        // Example dummy data, should be fetched from backend via API
+        const dummyData = {
+            daily: { selling: 200000, buying: 120000, expenses: 30000 },
+            weekly: { selling: 1400000, buying: 850000, expenses: 100000 },
+            monthly: { selling: 6000000, buying: 3900000, expenses: 350000 },
+            yearly: { selling: 72000000, buying: 45600000, expenses: 3000000 },
+        };
+
+        function calculateProfit() {
+            const filter = document.getElementById("profitFilter").value;
+            const data = dummyData[filter];
+
+            const netProfit = data.selling - data.buying - data.expenses;
+
+            document.getElementById("totalSelling").innerText = `UGX ${data.selling.toLocaleString()}`;
+            document.getElementById("totalBuying").innerText = `UGX ${data.buying.toLocaleString()}`;
+            document.getElementById("totalExpenses").innerText = `UGX ${data.expenses.toLocaleString()}`;
+            document.getElementById("netProfit").innerText = `UGX ${netProfit.toLocaleString()}`;
+        }
+
+        // Auto-calculate on load
+        window.onload = calculateProfit;
+    </script>
+</body>
+
+</html>

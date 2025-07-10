@@ -54,7 +54,8 @@ def insert_order():
 
 @app.route('/editProduct', methods=['PUT'])
 def edit_product():
-    request_payload = json.loads(request.form['data'])
+    # request_payload = json.loads(request.form['data'])
+    request_payload = request.get_json()
     updated_id = products_dao.update_product(connection, request_payload)
     response = jsonify({
         'updated_id': updated_id
