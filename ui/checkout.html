@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background-image: url('./images/bg.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checkout-container {
+      max-width: 1000px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .checkout-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .checkout-header h2 {
+      font-weight: bold;
+    }
+
+    .table thead {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .checkout-container {
+        padding: 15px;
+      }
+
+      .btn-group {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .btn-group .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container checkout-container">
+    <div class="checkout-header">
+      <h2>Checkout</h2>
+      <p class="text-muted">Review and confirm the sale</p>
+    </div>
+
+    <!-- Sale Summary Table -->
+    <div class="table-responsive mb-4">
+      <table class="table table-bordered align-middle">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="checkoutItems"></tbody>
+      </table>
+    </div>
+
+    <!-- Totals & Buttons -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+      <h4>Total: <span id="grandTotal">UGX 0</span></h4>
+      <div class="d-flex gap-2 flex-wrap btn-group">
+        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#calcModal">🧮 Calculator</button>
+        <button class="btn btn-primary" onclick="saveSale()">Save</button>
+        <button class="btn btn-success" onclick="saveAndPrint()">Save & Print</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculator Modal -->
+  <div class="modal fade" id="calcModal" tabindex="-1" aria-labelledby="calcModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5 class="modal-title" id="calcModalLabel">Balance Calculator</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="totalAmount" class="form-label">Total Amount (UGX)</label>
+            <input type="text" id="totalAmount" class="form-control" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="amountPaid" class="form-label">Amount Paid (UGX)</label>
+            <input type="number" id="amountPaid" class="form-control" oninput="calculateBalance()" />
+          </div>
+          <div class="mb-3">
+            <label for="balance" class="form-label">Change / Balance (UGX)</label>
+            <input type="text" id="balance" class="form-control" readonly />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap & Logic -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    let checkoutItems = [];
+
+    function renderCheckoutItems() {
+      const tbody = document.getElementById("checkoutItems");
+      tbody.innerHTML = "";
+      let total = 0;
+
+      checkoutItems.forEach((item, index) => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td><input type="number" min="1" value="${item.qty}" class="form-control" onchange="updateQty(${index}, this.value)" /></td>
+            <td>UGX ${item.price.toLocaleString()}</td>
+            <td>UGX ${itemTotal.toLocaleString()}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="removeItem(${index})">Remove</button></td>
+          </tr>
+        `;
+      });
+
+      document.getElementById("grandTotal").textContent = "UGX " + total.toLocaleString();
+    }
+
+    function updateQty(index, qty) {
+      checkoutItems[index].qty = parseInt(qty);
+      renderCheckoutItems();
+    }
+
+    function removeItem(index) {
+      checkoutItems.splice(index, 1);
+      renderCheckoutItems();
+    }
+
+    function getGrandTotal() {
+      return checkoutItems.reduce((sum, item) => sum + item.price * item.qty, 0);
+    }
+
+    function calculateBalance() {
+      const total = getGrandTotal();
+      const paid = parseFloat(document.getElementById("amountPaid").value) || 0;
+      const balance = paid - total;
+      document.getElementById("balance").value = balance.toLocaleString("en-UG");
+    }
+
+    async function saveSale(print = false) {
+      if (checkoutItems.length === 0) {
+        alert("Please add items to the sale before proceeding.");
+        return;
+      }
+
+      const orderPayload = {
+        customer_name: "Walk-in",
+        grand_total: getGrandTotal(),
+        order_details: checkoutItems.map(item => ({
+          product_id: item.product_id || item.id,
+          quantity: item.qty,
+          total_price: item.qty * item.price
+        }))
+      };
+
+      try {
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(orderPayload));
+
+        const response = await fetch('http://localhost:5000/insertOrder', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.order_id) {
+          alert("Sale saved successfully!");
+
+          if (print) {
+            window.print();
+          }
+
+          localStorage.removeItem("saleItems");
+          window.location.href = "make-sale.html";
+        } else {
+          alert("Failed to save sale.");
+        }
+      } catch (error) {
+        console.error("Error saving sale:", error);
+        alert("Error saving sale.");
+      }
+    }
+
+    function saveAndPrint() {
+      saveSale(true);
+    }
+
+    document.getElementById("calcModal").addEventListener("show.bs.modal", () => {
+      document.getElementById("totalAmount").value = getGrandTotal().toLocaleString("en-UG");
+      document.getElementById("amountPaid").value = "";
+      document.getElementById("balance").value = "";
+    });
+
+    window.onload = () => {
+      try {
+        const data = localStorage.getItem("saleItems");
+        if (data) {
+          checkoutItems = JSON.parse(data);
+          renderCheckoutItems();
+        } else {
+          alert("No sale data found. Please start from the 'Make a Sale' page.");
+        }
+      } catch (err) {
+        console.error("Error loading sale data:", err);
+      }
+    };
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Order Details</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url('./images/bg.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+
+        .order-details-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .order-details-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .order-details-header h2 {
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container order-details-container">
+        <div class="order-details-header">
+            <h2>Order Details</h2>
+
+        </div>
+        <p><strong>Order ID:</strong> <span id="order-id"></span></p>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                </tr>
+            </thead>
+            <tbody id="order-details-body">
+                <!-- JS fills this -->
+            </tbody>
+        </table>
+        <a href="orders.html" class="btn btn-secondary">Back to Orders</a>
+    </div>
+
+    <script src="js/packages/jquery.min.js"></script>
+    <script>
+        const orderDetailsApiUrl = 'http://localhost:5000/getOrderDetails/';
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order_id');
+
+        $('#order-id').text(orderId);
+
+        if (orderId) {
+            // Fetch order details from the backend
+            fetch(orderDetailsApiUrl + orderId)
+                .then(res => res.json())
+                .then(data => {
+                    console.log('Fetched data:', data);
+                    let rows = '';
+                    data.forEach(item => {
+                        rows += `
+        <tr>
+          <td>${item.product_name}</td>
+          <td>${item.price_per_unit.toFixed(2)}</td>
+          <td>${item.quantity}</td>
+          <td>${parseFloat(item.total_price).toFixed(2)}</td>
+
+        </tr>
+      `;
+                    });
+                    $('#order-details-body').html(rows);
+                })
+                .catch(error => {
+                    console.error('Error fetching order details:', error);
+                });
+
+        }
+    </script>
+</body>
+
+</html>

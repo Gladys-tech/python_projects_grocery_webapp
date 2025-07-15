@@ -9,10 +9,12 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* background-color: #f8f9fa; */
             background-image: url('./images/bg.jpg');
             background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             padding-top: 0;
+            margin: 0;
         }
 
         .sale-container {
@@ -51,7 +53,7 @@
         }
 
         .btn-orange:hover {
-            background-color: #2196f3;
+            background-color: #1976d2;
         }
 
         @media (max-width: 768px) {
@@ -67,7 +69,6 @@
 </head>
 
 <body>
-
     <div class="container sale-container">
         <div class="sale-header">
             <h2>Make a Sale</h2>
@@ -76,8 +77,8 @@
 
         <!-- Search / Scan -->
         <div class="mb-4">
-            <input type="text" class="form-control" id="searchProduct" placeholder="Search product name or scan barcode"
-                oninput="searchProduct()" />
+            <input type="text" class="form-control" id="searchProduct"
+                placeholder="Search product name or scan barcode" />
         </div>
 
         <!-- Sale Table -->
@@ -92,67 +93,50 @@
                         <th>Remove</th>
                     </tr>
                 </thead>
-                <tbody id="saleItems">
-                    <!-- Sale rows will appear here -->
-                </tbody>
+                <tbody id="saleItems"></tbody>
             </table>
         </div>
 
         <!-- Total and Button -->
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <h4>Total: <span id="grandTotal">UGX 0</span></h4>
-            <!-- <button class="btn btn-orange mt-2 mt-md-0" onclick="completeSale()">Complete Sale</button> -->
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#calcModal">
-                    🧮 Calculator
-                </button>
-                <button class="btn btn-orange" onclick="completeSale()">Complete Sale</button>
-            </div>
-
+            <button class="btn btn-orange" onclick="goToCheckout()">Continue to Checkout</button>
         </div>
     </div>
-
-    <!-- Calculator Modal -->
-    <div class="modal fade" id="calcModal" tabindex="-1" aria-labelledby="calcModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content p-3">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="calcModalLabel">Balance Calculator</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="totalAmount" class="form-label">Total Amount (UGX)</label>
-                        <input type="text" id="totalAmount" class="form-control" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="amountPaid" class="form-label">Amount Paid (UGX)</label>
-                        <input type="number" id="amountPaid" class="form-control" oninput="calculateBalance()">
-                    </div>
-                    <div class="mb-3">
-                        <label for="balance" class="form-label">Change / Balance (UGX)</label>
-                        <input type="text" id="balance" class="form-control" readonly>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 
     <script>
         let saleItems = [];
+        let productList = [];
 
-        function searchProduct() {
-            const query = document.getElementById('searchProduct').value.trim();
-            // You can fetch from your backend with fetch(`/search?query=${query}`)
-            if (query.length >= 3) {
-                // Example: Hardcoded matching product
-                addProductToSale({ name: query, price: 3500 });
+        // Load products from backend
+        async function fetchProducts() {
+            try {
+                const res = await fetch('http://localhost:5000/getProducts');
+                productList = await res.json();
+            } catch (error) {
+                console.error('Error loading products:', error);
+                alert('Failed to load products from server.');
             }
         }
 
+        // Search bar logic
+        document.getElementById('searchProduct').addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            if (query.length >= 3) {
+                const matched = productList.find(p => p.name.toLowerCase() === query);
+                if (matched) {
+                    addProductToSale({
+                        product_id: matched.product_id,
+                        name: matched.name,
+                        price: matched.price_per_unit
+                    });
+                    this.value = ''; // Clear input
+                }
+            }
+        });
+
         function addProductToSale(product) {
-            const index = saleItems.findIndex(item => item.name === product.name);
+            const index = saleItems.findIndex(item => item.product_id === product.product_id);
             if (index > -1) {
                 saleItems[index].qty += 1;
             } else {
@@ -198,34 +182,20 @@
             renderSaleItems();
         }
 
-        function completeSale() {
-            alert('Sale completed!');
-            // You would send saleItems to your backend using fetch()
+        function goToCheckout() {
+            if (saleItems.length === 0) {
+                alert('Please add items to the sale before proceeding.');
+                return;
+            }
+            localStorage.setItem('saleItems', JSON.stringify(saleItems));
+            window.location.href = 'checkout.html';
         }
 
-        function calculateBalance() {
-            const total = getGrandTotal();
-            const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
-            const balance = paid - total;
-            document.getElementById('balance').value = balance.toLocaleString('en-UG', { minimumFractionDigits: 0 });
-        }
-
-        function getGrandTotal() {
-            return saleItems.reduce((sum, item) => sum + item.price * item.qty, 0);
-        }
-
-        // Update modal with current total when it's opened
-        const calcModal = document.getElementById('calcModal');
-        calcModal.addEventListener('show.bs.modal', () => {
-            document.getElementById('totalAmount').value = getGrandTotal().toLocaleString('en-UG', { minimumFractionDigits: 0 });
-            document.getElementById('amountPaid').value = '';
-            document.getElementById('balance').value = '';
-        });
-
-
+        // Init
+        window.onload = async () => {
+            await fetchProducts();
+        };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 
 </html>
