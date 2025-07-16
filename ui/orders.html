@@ -61,11 +61,12 @@
                             <div class="row mb-4">
                                 <div class="col-sm-4">
                                     <label for="filterRange">Filter By:</label>
-                                    <select id="filterRange" class="form-control">
-                                        <option value="all">All</option>
-                                        <option value="daily">Today</option>
-                                        <option value="weekly">This Week</option>
-                                        <option value="monthly">This Month</option>
+                                    <select id="dateFilter" class="form-select">
+                                        <option value="All">All</option>
+                                        <option value="Today">Today</option>
+                                        <option value="Yesterday">Yesterday</option>
+                                        <option value="ThisWeek">This Week</option>
+                                        <option value="ThisMonth">This Month</option>
                                     </select>
                                 </div>
                             </div>
@@ -78,7 +79,7 @@
                                     <th>Total Cost</th>
                                     <th>Action</th>
                                 </thead>
-                                <tbody>
+                                <tbody id="orderTableBody">
 
                                 </tbody>
                             </table>
@@ -108,71 +109,6 @@
         </div>
     </div>
 </body>
-
-<script>
-    let allTransactions = []; // Store all data initially
-
-    function fetchTransactions() {
-        $.get('http://127.0.0.1:5000/getAllOrders', function (data) {
-            allTransactions = data;
-            renderTable(allTransactions);
-        });
-    }
-
-    function renderTable(data) {
-        const tbody = $('table tbody');
-        tbody.empty();
-        if (!data.length) {
-            tbody.append('<tr><td colspan="5" class="text-center">No transactions found</td></tr>');
-            return;
-        }
-        data.forEach(row => {
-            tbody.append(`
-                <tr>
-                    <td>${row.date}</td>
-                    <td>${row.order_number}</td>
-                    <td>${row.customer_name}</td>
-                    <td>${row.total_cost}</td>
-                    <td><a href="order-view.html?id=${row.id}" class="btn btn-xs btn-info">View</a></td>
-                </tr>
-            `);
-        });
-    }
-
-    function filterTransactions(type) {
-        const now = new Date();
-        let filtered = [];
-
-        filtered = allTransactions.filter(order => {
-            const orderDate = new Date(order.date);
-            if (type === "daily") {
-                return orderDate.toDateString() === now.toDateString();
-            } else if (type === "weekly") {
-                const firstDayOfWeek = new Date(now);
-                firstDayOfWeek.setDate(now.getDate() - now.getDay());
-                const lastDayOfWeek = new Date(firstDayOfWeek);
-                lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
-                return orderDate >= firstDayOfWeek && orderDate <= lastDayOfWeek;
-            } else if (type === "monthly") {
-                return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear();
-            } else {
-                return true; // 'all'
-            }
-        });
-
-        renderTable(filtered);
-    }
-
-    $(document).ready(function () {
-        fetchTransactions();
-
-        $('#filterRange').on('change', function () {
-            const filterType = $(this).val();
-            filterTransactions(filterType);
-        });
-    });
-</script>
-
 
 <script src="js/packages/jquery.min.js"></script>
 <script src="js/custom/common.js"></script>
