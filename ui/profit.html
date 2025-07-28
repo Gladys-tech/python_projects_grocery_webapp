@@ -103,35 +103,72 @@
             </div>
         </div>
 
-        <div class="text-end mt-4">
+        <!-- <div class="text-end mt-4">
             <button class="btn btn-calculate" onclick="calculateProfit()">Calculate</button>
-        </div>
+        </div> -->
     </div>
 
-    <script>
-        // Example dummy data, should be fetched from backend via API
-        const dummyData = {
-            daily: { selling: 200000, buying: 120000, expenses: 30000 },
-            weekly: { selling: 1400000, buying: 850000, expenses: 100000 },
-            monthly: { selling: 6000000, buying: 3900000, expenses: 350000 },
-            yearly: { selling: 72000000, buying: 45600000, expenses: 3000000 },
-        };
+    <!-- <script>
+        const apiUrl = "http://127.0.0.1:5000/getProfitSummary";
 
         function calculateProfit() {
-            const filter = document.getElementById("profitFilter").value;
-            const data = dummyData[filter];
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const selling = data.total_revenue || 0;
+                    const expenses = data.total_expenses || 0;
+                    const buying = 0; // Optional: Add if you have buying price details stored
 
-            const netProfit = data.selling - data.buying - data.expenses;
+                    const netProfit = selling - expenses;
 
-            document.getElementById("totalSelling").innerText = `UGX ${data.selling.toLocaleString()}`;
-            document.getElementById("totalBuying").innerText = `UGX ${data.buying.toLocaleString()}`;
-            document.getElementById("totalExpenses").innerText = `UGX ${data.expenses.toLocaleString()}`;
-            document.getElementById("netProfit").innerText = `UGX ${netProfit.toLocaleString()}`;
+                    document.getElementById("totalSelling").innerText = `UGX ${selling.toLocaleString()}`;
+                    document.getElementById("totalBuying").innerText = `UGX ${buying.toLocaleString()}`; // Placeholder
+                    document.getElementById("totalExpenses").innerText = `UGX ${expenses.toLocaleString()}`;
+                    document.getElementById("netProfit").innerText = `UGX ${netProfit.toLocaleString()}`;
+                })
+                .catch(error => {
+                    console.error("Error fetching profit data:", error);
+                    alert("Failed to load profit data.");
+                });
         }
 
         // Auto-calculate on load
         window.onload = calculateProfit;
+    </script> -->
+
+    <script>
+        const apiUrl = "http://127.0.0.1:5000/getProfitSummary";
+
+        function calculateProfit() {
+            const filter = document.getElementById("profitFilter").value;
+
+            fetch(`${apiUrl}?filter=${filter}`)
+                .then(response => response.json())
+                .then(data => {
+                    const selling = data.total_revenue || 0;
+                    const expenses = data.total_expenses || 0;
+                    const buying = 0; // Add buying logic if needed
+
+                    const netProfit = selling - expenses;
+
+                    document.getElementById("totalSelling").innerText = `UGX ${selling.toLocaleString()}`;
+                    document.getElementById("totalBuying").innerText = `UGX ${buying.toLocaleString()}`;
+                    document.getElementById("totalExpenses").innerText = `UGX ${expenses.toLocaleString()}`;
+                    document.getElementById("netProfit").innerText = `UGX ${netProfit.toLocaleString()}`;
+                })
+                .catch(error => {
+                    console.error("Error fetching profit data:", error);
+                    alert("Failed to load profit data.");
+                });
+        }
+
+        document.getElementById("profitFilter").addEventListener("change", calculateProfit);
+
+        // Auto-calculate on load
+        window.onload = calculateProfit;
     </script>
+
+
 </body>
 
 </html>

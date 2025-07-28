@@ -7,6 +7,8 @@ import json
 import products_dao
 import orders_dao
 import uom_dao
+import expenses_dao
+import profits_dao
 
 app = Flask(__name__)
 CORS(app)
@@ -85,6 +87,37 @@ def delete_product():
     response = jsonify({
         'product_id': return_id
     })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/addExpense', methods=['POST'])
+def add_expense():
+    request_payload = request.get_json()
+    expense_id = expenses_dao.insert_new_expense(connection, request_payload)
+    response = jsonify({
+        'expense_id': expense_id
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+@app.route('/getExpenses', methods=['GET'])
+def get_expenses():
+    expenses = expenses_dao.get_all_expenses(connection)
+    response = jsonify(expenses)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
+# @app.route('/getProfitSummary', methods=['GET'])
+# def get_profit_summary():
+#     summary = profits_dao.calculate_profit(connection)
+#     response = jsonify(summary)
+#     response.headers.add('Access-Control-Allow-Origin', '*')
+#     return response
+@app.route('/getProfitSummary', methods=['GET'])
+def get_profit_summary():
+    filter_option = request.args.get('filter', 'daily')  # default to daily
+    summary = profits_dao.calculate_profit(connection, filter_option)
+    response = jsonify(summary)
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 

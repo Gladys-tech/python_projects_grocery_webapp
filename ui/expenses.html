@@ -51,6 +51,21 @@
                 </button>
             </div>
             <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Filter By:</label>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary filter-btn" data-filter="all">All</button>
+                        <button type="button" class="btn btn-outline-primary filter-btn"
+                            data-filter="daily">Today</button>
+                        <button type="button" class="btn btn-outline-primary filter-btn" data-filter="weekly">This
+                            Week</button>
+                        <button type="button" class="btn btn-outline-primary filter-btn" data-filter="monthly">This
+                            Month</button>
+                        <button type="button" class="btn btn-outline-primary filter-btn" data-filter="yearly">This
+                            Year</button>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered align-middle text-center">
                         <thead class="table-light">
@@ -66,7 +81,12 @@
                         <tbody id="expenseTableBody">
                             <!-- Expense rows will be populated here dynamically -->
                         </tbody>
+
                     </table>
+                    <!-- Example below the table -->
+                    <div style="margin-top: 10px; font-weight: bold;">
+                        Total Expenses: <span id="totalExpenses">0</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -82,11 +102,6 @@
                 </div>
                 <div class="modal-body">
                     <form id="expenseForm">
-                        <input type="hidden" id="expenseId">
-                        <div class="mb-3">
-                            <label for="expenseDate" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="expenseDate" required>
-                        </div>
                         <div class="mb-3">
                             <label for="expenseCategory" class="form-label">Category</label>
                             <input type="text" class="form-control" id="expenseCategory"
@@ -115,73 +130,226 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-        let expenses = [];
-        let editIndex = -1;
+    <!-- <script>
+        const GET_EXPENSES_URL = "http://127.0.0.1:5000/getExpenses";
+        const ADD_EXPENSE_URL = "http://127.0.0.1:5000/addExpense";
 
-        // Handle form submission
+        // Load all expenses when the page loads
+        $(document).ready(function () {
+            loadExpenses();
+        });
+
+        let allExpenses = [];
+
+        $(document).ready(function () {
+            $.get(GET_EXPENSES_URL, function (data) {
+                allExpenses = data || [];
+                renderExpenses(allExpenses);
+            });
+
+            $(".filter-btn").on("click", function () {
+                const filterType = $(this).data("filter");
+                const filtered = filterExpenses(allExpenses, filterType);
+                renderExpenses(filtered);
+            });
+        });
+
+        function filterExpenses(expenses, type) {
+            const now = new Date();
+            return expenses.filter(exp => {
+                const date = new Date(exp.date);
+                switch (type) {
+                    case "daily":
+                        return date.toDateString() === now.toDateString();
+                    case "weekly": {
+                        const dayDiff = (now - date) / (1000 * 60 * 60 * 24);
+                        return dayDiff <= 7 && date.getFullYear() === now.getFullYear();
+                    }
+                    case "monthly":
+                        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                    case "yearly":
+                        return date.getFullYear() === now.getFullYear();
+                    case "all":
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        // Fetch and render expenses
+        function loadExpenses() {
+            $.get(GET_EXPENSES_URL, function (data) {
+                const tbody = $("#expenseTableBody");
+                tbody.empty();
+                let totalAmount = 0;
+
+                if (!Array.isArray(data)) {
+                    alert("Failed to load expenses.");
+                    return;
+                }
+                data.forEach(expense => {
+                    totalAmount += parseFloat(expense.amount);
+                });
+
+                data.forEach((exp, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${exp.date}</td>
+                            <td>${exp.category}</td>
+                            <td>${exp.description}</td>
+                            <td>${parseFloat(exp.amount).toLocaleString()}</td>
+                            <td><span class="text-muted">N/A</span></td>
+                        </tr>
+                    `);
+                    // Display the total
+                    $('#totalExpenses').text(totalAmount.toFixed(2));
+                });
+            });
+        }
+
+        // Submit form to add a new expense
         $("#expenseForm").on("submit", function (e) {
             e.preventDefault();
 
-            const expense = {
-                id: $("#expenseId").val() || Date.now(),
-                date: $("#expenseDate").val(),
+            const payload = {
                 category: $("#expenseCategory").val(),
                 description: $("#expenseDescription").val(),
                 amount: parseFloat($("#expenseAmount").val())
             };
 
-            if (editIndex >= 0) {
-                expenses[editIndex] = expense;
-                editIndex = -1;
-            } else {
-                expenses.push(expense);
+            if (!payload.category || !payload.description || isNaN(payload.amount)) {
+                alert("Please fill out all fields correctly.");
+                return;
             }
 
-            renderExpenses();
-            $("#expenseModal").modal("hide");
-            this.reset();
+            $.ajax({
+                url: ADD_EXPENSE_URL,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                success: function () {
+                    $("#expenseModal").modal("hide");
+                    $("#expenseForm")[0].reset();
+                    loadExpenses();
+                },
+                error: function () {
+                    alert("Failed to add expense.");
+                }
+            });
+        });
+    </script> -->
+    <script>
+        const GET_EXPENSES_URL = "http://127.0.0.1:5000/getExpenses";
+        const ADD_EXPENSE_URL = "http://127.0.0.1:5000/addExpense";
+        let allExpenses = [];
+
+        $(document).ready(function () {
+            loadExpenses();
+
+            // Filter button click
+            $(".filter-btn").on("click", function () {
+                const filterType = $(this).data("filter");
+                const filtered = filterExpenses(allExpenses, filterType);
+                renderExpenses(filtered);
+            });
+
+            // Form submit
+            $("#expenseForm").on("submit", function (e) {
+                e.preventDefault();
+
+                const payload = {
+                    category: $("#expenseCategory").val(),
+                    description: $("#expenseDescription").val(),
+                    amount: parseFloat($("#expenseAmount").val())
+                };
+
+                if (!payload.category || !payload.description || isNaN(payload.amount)) {
+                    alert("Please fill out all fields correctly.");
+                    return;
+                }
+
+                $.ajax({
+                    url: ADD_EXPENSE_URL,
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(payload),
+                    success: function () {
+                        $("#expenseModal").modal("hide");
+                        $("#expenseForm")[0].reset();
+                        loadExpenses();
+                    },
+                    error: function () {
+                        alert("Failed to add expense.");
+                    }
+                });
+            });
         });
 
-        function renderExpenses() {
-            const tbody = $("#expenseTableBody");
-            tbody.empty();
+        function loadExpenses() {
+            $.get(GET_EXPENSES_URL, function (data) {
+                if (!Array.isArray(data)) {
+                    alert("Failed to load expenses.");
+                    return;
+                }
 
-            expenses.forEach((exp, index) => {
-                tbody.append(`
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${exp.date}</td>
-                    <td>${exp.category}</td>
-                    <td>${exp.description}</td>
-                    <td>${exp.amount.toLocaleString()}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-2" onclick="editExpense(${index})">Edit</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteExpense(${index})">Delete</button>
-                    </td>
-                </tr>
-            `);
+                allExpenses = data || [];
+                renderExpenses(allExpenses);
             });
         }
 
-        function editExpense(index) {
-            const exp = expenses[index];
-            $("#expenseId").val(exp.id);
-            $("#expenseDate").val(exp.date);
-            $("#expenseCategory").val(exp.category);
-            $("#expenseDescription").val(exp.description);
-            $("#expenseAmount").val(exp.amount);
-            $("#expenseModal").modal("show");
-            editIndex = index;
+        function renderExpenses(expenses) {
+            const tbody = $("#expenseTableBody");
+            tbody.empty();
+            let totalAmount = 0;
+
+            expenses.forEach((exp, index) => {
+                const amount = parseFloat(exp.amount);
+                totalAmount += amount;
+
+                tbody.append(`
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${formatDate(exp.date)}</td>
+                    <td>${exp.category}</td>
+                    <td>${exp.description}</td>
+                    <td>${amount.toLocaleString()}</td>
+                    <td><span class="text-muted">N/A</span></td>
+                </tr>
+            `);
+            });
+
+            $('#totalExpenses').text(totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 }));
         }
 
-        function deleteExpense(index) {
-            if (confirm("Are you sure you want to delete this expense?")) {
-                expenses.splice(index, 1);
-                renderExpenses();
-            }
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString(); // Customize if needed
+        }
+
+        function filterExpenses(expenses, type) {
+            const now = new Date();
+            return expenses.filter(exp => {
+                const date = new Date(exp.date);
+                switch (type) {
+                    case "daily":
+                        return date.toDateString() === now.toDateString();
+                    case "weekly": {
+                        const dayDiff = (now - date) / (1000 * 60 * 60 * 24);
+                        return dayDiff <= 7 && date.getFullYear() === now.getFullYear();
+                    }
+                    case "monthly":
+                        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                    case "yearly":
+                        return date.getFullYear() === now.getFullYear();
+                    case "all":
+                    default:
+                        return true;
+                }
+            });
         }
     </script>
+
 
 </body>
 
