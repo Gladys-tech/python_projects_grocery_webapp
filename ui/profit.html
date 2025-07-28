@@ -147,9 +147,9 @@
                 .then(data => {
                     const selling = data.total_revenue || 0;
                     const expenses = data.total_expenses || 0;
-                    const buying = 0; // Add buying logic if needed
+                    const buying = data. total_buying_price || 0; 
 
-                    const netProfit = selling - expenses;
+                    const netProfit = selling - (expenses+ buying);
 
                     document.getElementById("totalSelling").innerText = `UGX ${selling.toLocaleString()}`;
                     document.getElementById("totalBuying").innerText = `UGX ${buying.toLocaleString()}`;

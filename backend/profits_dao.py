@@ -56,12 +56,26 @@ def calculate_profit(connection, filter_option='daily'):
     expenses_result = cursor.fetchone()
     total_expenses = expenses_result['total_expenses'] or 0
 
-    profit = total_revenue - total_expenses
+     # Buying Price Total (COGS)
+    cursor.execute(f"""
+        SELECT SUM(oi.quantity * p.buying_price) AS total_buying_price
+        FROM orders o
+        JOIN order_details oi ON o.order_id = oi.order_id
+        JOIN products p ON oi.product_id = p.product_id
+        WHERE {condition}
+    """)
+    buying_result = cursor.fetchone()
+    total_buying_price = buying_result['total_buying_price'] or 0
+
+    # profit = total_revenue - total_expenses
+    # Profit = Revenue - (Expenses + Buying Cost)
+    profit = total_revenue - total_expenses - total_buying_price
 
     cursor.close()
 
     return {
         'total_revenue': total_revenue,
         'total_expenses': total_expenses,
+        'total_buying_price': total_buying_price,
         'profit': profit
     }
