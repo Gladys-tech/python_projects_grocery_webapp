@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Signup - GSMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Bootstrap & Google Fonts -->
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to right, #f5f5f5, #e8f5e9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .signup-form {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .signup-form h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .form-control {
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="signup-form">
+        <h2>Create Account</h2>
+        <input type="text" id="username" class="form-control" placeholder="Username" required />
+        <input type="password" id="password" class="form-control" placeholder="Password" required />
+
+        <select id="role" class="form-control" required>
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="cashier">Cashier</option>
+        </select>
+
+        <button onclick="signup()" class="btn btn-primary">Sign Up</button>
+        <p class="message" id="message"></p>
+        <p class="message">Already have an account? <a href="login.html">Login</a></p>
+    </div>
+
+    <script>
+        function signup() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const role = document.getElementById("role").value;
+            const message = document.getElementById("message");
+
+            if (!username || !password || !role) {
+                message.textContent = "Please fill all fields.";
+                message.style.color = "red";
+                return;
+            }
+
+            fetch("http://127.0.0.1:5000/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password, role })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        message.textContent = "Signup successful! Redirecting to login...";
+                        message.style.color = "green";
+                        setTimeout(() => {
+                            window.location.href = "login.html";
+                        }, 1500);
+                    } else {
+                        message.textContent = data.error || "Signup failed.";
+                        message.style.color = "red";
+                    }
+                })
+                .catch(err => {
+                    message.textContent = "Server error.";
+                    message.style.color = "red";
+                });
+        }
+    </script>
+
+</body>
+
+</html>

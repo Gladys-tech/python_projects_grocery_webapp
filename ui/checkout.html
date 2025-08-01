@@ -176,7 +176,8 @@
       }
 
       const orderPayload = {
-        customer_name: "Walk-in",
+        // customer_name: "Walk-in",
+        customer_name: localStorage.getItem('username') || "Walk-in",
         grand_total: getGrandTotal(),
         order_details: checkoutItems.map(item => ({
           product_id: item.product_id || item.id,
