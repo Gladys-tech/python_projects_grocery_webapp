@@ -6,19 +6,28 @@ $(function () {
         if (response) {
             var table = '';
             $.each(response, function (index, product) {
+                // var quantity = product.quantity || 0;
+                // var lowStockClass = quantity <= 5 ? 'low-stock' : '';
                 // Build table rows with product data
                 table += '<tr data-id="' + product.product_id +
                     '" data-name="' + product.name +
                     '" data-unit="' + product.uom_id +
                     '" data-price="' + product.price_per_unit +
                     '" data-buying-price="' + (product.buying_price || 0) + '">' +
+                    '" data-quantity="' + (product.quantity || 0) + '">' +
                     '<td>' + product.name + '</td>' +
                     '<td>' + product.uom_name + '</td>' +
                     '<td>' + product.price_per_unit + '</td>' +
                     '<td>' + (product.buying_price || 0) + '</td>' +
+                    '<td>' + (product.quantity || 0) + '</td>' +
                     '<td><span class="btn btn-xs btn-danger delete-product">Delete</span> <span class="btn btn-xs btn-primary edit-product">Edit</span></td></tr>';
 
             });
+            var lowStockItems = response.filter(p => (p.quantity || 0) <= 5);
+            if (lowStockItems.length > 0) {
+                alert("Warning: " + lowStockItems.length + " product(s) are low in stock!");
+            }
+
             $("table").find('tbody').empty().html(table);
         }
     });
@@ -31,6 +40,7 @@ $(document).on("click", ".edit-product", function () {
     var unit = tr.data('unit');
     var price = tr.data('price');
     var buyingPrice = tr.data('buying-price') || 0;
+    var quantity = tr.data('quantity') || 0;
 
 
     // Set values in modal form
@@ -39,12 +49,14 @@ $(document).on("click", ".edit-product", function () {
     $("#uoms").val(unit);
     $("#price").val(price);
     $("#buying_price").val(buyingPrice);
+    $("#quantity").val(quantity);
 
     console.log("Editing product with ID:", id);
     console.log("Editing product with name:", name);
     console.log("Editing product with uom_id:", unit);
     console.log("Editing product with price:", price);
     console.log("Editing product with buying price:", buyingPrice);
+    console.log("Editing product with quantity:", quantity);
 
     console.log(tr[0].outerHTML); // to see all data-* attributes directly
 
@@ -64,7 +76,8 @@ $("#saveProduct").on("click", function () {
         product_name: null,
         uom_id: null,
         price_per_unit: null,
-        buying_price: null
+        buying_price: null,
+        quantity: null
     };
     for (var i = 0; i < data.length; ++i) {
         var element = data[i];
@@ -83,6 +96,9 @@ $("#saveProduct").on("click", function () {
                 break;
             case 'buying_price':
                 requestPayload.buying_price = element.value;
+                break;
+            case 'quantity':
+                requestPayload.quantity = element.value;
                 break;
         }
     }
@@ -119,7 +135,7 @@ $(document).on("click", ".delete-product", function () {
 productModal.on('hide.bs.modal', function () {
     $("#id").val('0');
     // $("#productId").val('0');
-    $("#name, #unit, #price,  #buying_price").val('');
+    $("#name, #unit, #price,  #buying_price, #quantity").val('');
     productModal.find('.modal-title').text('Add New Product');
 });
 

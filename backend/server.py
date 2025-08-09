@@ -52,13 +52,29 @@ def get_all_orders():
 
 @app.route('/insertOrder', methods=['POST'])
 def insert_order():
-    request_payload = json.loads(request.form['data'])
-    order_id = orders_dao.insert_order(connection, request_payload)
-    response = jsonify({
-        'order_id': order_id
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    try:
+        request_payload = json.loads(request.form.get('data', '{}'))
+    except Exception:
+        return jsonify({'success': False, 'error': 'Invalid payload'}), 400
+
+    try:
+        order_id = orders_dao.insert_order(connection, request_payload)
+        return jsonify({'success': True, 'order_id': order_id})
+    except ValueError as ve:
+        # Known error from stock check (friendly message)
+        return jsonify({'success': False, 'error': str(ve)}), 400
+    except Exception as e:
+        # Log full exception server-side for debugging
+        print("Unexpected error inserting order:", e)
+        return jsonify({'success': False, 'error': 'Internal server error'}), 500
+# def insert_order():
+#     request_payload = json.loads(request.form['data'])
+#     order_id = orders_dao.insert_order(connection, request_payload)
+#     response = jsonify({
+#         'order_id': order_id
+#     })
+#     response.headers.add('Access-Control-Allow-Origin', '*')
+#     return response
 
 @app.route('/getOrderDetails/<int:order_id>', methods=['GET'])
 def get_order_details(order_id):

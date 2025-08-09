@@ -76,7 +76,11 @@
                             <option value="monthly">Monthly</option>
                             <option value="yearly">Yearly</option>
                         </select>
-                        <button class="btn btn-secondary ml-2 print-btn" onclick="printSection('sales')">Print</button>
+                        <div class="d-flex">
+                            <button class="btn btn-secondary mr-2" onclick="printSection('sales')">Print</button>
+                            <button class="btn btn-success" onclick="downloadPDF('sales')">Download PDF</button>
+                        </div>
+
                     </div>
                 </div>
                 <div id="salesContent" class="card p-3">
@@ -92,7 +96,10 @@
             <div class="tab-pane fade" id="inventory" role="tabpanel">
                 <div class="report-header">
                     <h5>Inventory Report</h5>
-                    <button class="btn btn-secondary print-btn" onclick="printSection('inventory')">Print</button>
+                    <div class="d-flex">
+                        <button class="btn btn-secondary mr-2" onclick="printSection('inventory')">Print</button>
+                        <button class="btn btn-success" onclick="downloadPDF('inventory')">Download PDF</button>
+                    </div>
                 </div>
                 <!-- <div id="inventoryContent" class="card p-3">
                     <ul>
@@ -111,7 +118,10 @@
             <div class="tab-pane fade" id="credit" role="tabpanel">
                 <div class="report-header">
                     <h5>Credit Report</h5>
-                    <button class="btn btn-secondary print-btn" onclick="printSection('credit')">Print</button>
+                    <div class="d-flex">
+                        <button class="btn btn-secondary mr-2" onclick="printSection('credit')">Print</button>
+                        <button class="btn btn-success" onclick="downloadPDF('credit')">Download PDF</button>
+                    </div>
                 </div>
                 <!-- <div id="creditContent" class="card p-3">
                     <ul>
@@ -129,7 +139,10 @@
             <div class="tab-pane fade" id="staff" role="tabpanel">
                 <div class="report-header">
                     <h5>Staff Activity Report</h5>
-                    <button class="btn btn-secondary print-btn" onclick="printSection('staff')">Print</button>
+                    <div class="d-flex">
+                        <button class="btn btn-secondary mr-2" onclick="printSection('staff')">Print</button>
+                        <button class="btn btn-success" onclick="downloadPDF('staff')">Download PDF</button>
+                    </div>
                 </div>
                 <!-- <div id="staffContent" class="card p-3">
                     <ul>
@@ -146,19 +159,6 @@
         </div>
     </div>
 
-    <script>
-        function printSection(id) {
-            var content = document.getElementById(id + 'Content').innerHTML;
-            var win = window.open('', '', 'width=900,height=700');
-            win.document.write('<html><head><title>Print Report</title>');
-            win.document.write('<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">');
-            win.document.write('</head><body>');
-            win.document.write(content);
-            win.document.write('</body></html>');
-            win.document.close();
-            win.print();
-        }
-    </script>
 
     <script>
         function fetchSalesReport() {
@@ -225,6 +225,71 @@
         //         });
         // }
 
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        function printSection(id) {
+            const content = document.getElementById(id + 'Content').innerHTML;
+            const win = window.open('', '', 'width=900,height=700');
+
+            const html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Print Report</title>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+            <style>
+                body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
+            </style>
+        </head>
+        <body>
+            ${content}
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(function() { window.close(); }, 100);
+                };
+            <\/script>
+        </body>
+        </html>
+        `;
+
+            win.document.write(html);
+            win.document.close();
+        }
+
+        function downloadPDF(id) {
+            console.log("Starting PDF download for section:", id);
+
+            const element = document.getElementById(id + 'Content');
+            if (!element) {
+                console.error("Element not found:", id + 'Content');
+                alert("Content not found for PDF generation.");
+                return;
+            }
+
+            console.log("Element found. Preparing options...");
+
+            const opt = {
+                margin: 0.5,
+                filename: `${id}_report.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            console.log("Options set. Generating PDF...");
+
+            html2pdf().from(element).set(opt).save()
+                .then(() => {
+                    console.log("PDF successfully downloaded.");
+                })
+                .catch((error) => {
+                    console.error("PDF generation failed:", error);
+                    alert("An error occurred while downloading the PDF.");
+                });
+        }
     </script>
 
 
