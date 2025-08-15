@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title> GSMS </title>
+    <title> Alpha Stores </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,31 +18,11 @@
 
 <body class="tooltips">
     <div class="container">
-
-        <!-- <div class="header content rows-content-header">
-        <button class="button-menu-mobile show-sidebar">
-            <i class="fa fa-bars"></i>
-        </button>
-        <div class="navbar navbar-default" role="navigation">
-            <div class="container">
-
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav visible-lg visible-md limit-chars">
-                        <ul class="breadcrumb">
-                            <a href="index.html">
-                                <i class="zmdi zmdi-view-dashboard zmdi-hc-fw" title="Orders"></i>
-                            </a>
-                            <a href="manage-product.html">
-                                <i class="zmdi zmdi-assignment zmdi-hc-fw" title="Products"></i>
-                            </a>
-                        </ul>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
         <div class="right content-page">
+            <button class="btn btn-outline-secondary mb-3 mt-3 ml-3" onclick="goBack()">
+                &#8592; Back
+            </button>
+
             <div class="body content rows scroll-y">
                 <div class="box-info full" id="taskFormContainer">
                     <h2>Manage Products</h2>
@@ -55,6 +35,13 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-12">
+                                <button id="exportCsv" class="btn btn-sm btn-success">Export CSV</button>
+                                <button id="exportExcel" class="btn btn-sm btn-info">Export Excel</button>
+                                <button id="exportPdf" class="btn btn-sm btn-danger">Export PDF</button>
+                            </div>
+                        </div>
                         <table class="table table-bordered">
                             <thead>
                                 <th>Name</th>
@@ -64,7 +51,6 @@
                                 <th>Quantity</th>
                                 <th style="width: 150px">Action</th>
                             </thead>
-                            <!-- <input type="hidden" id="productId" name="product_id" value="0"> -->
                             <tbody>
 
                             </tbody>
@@ -82,8 +68,7 @@
                     </div>
                     <div class="modal-body">
                         <form id="productForm">
-                            <!-- <input type="hidden" name="id" id="id" value="0"> -->
-                             <input type="hidden" name="product_id" id="productId" value="0">
+                            <input type="hidden" name="product_id" id="productId" value="0">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
@@ -113,11 +98,11 @@
                                             id="buying_price" type="text" value="">
                                     </div>
                                 </div>
-                                 <div class="col-sm-12">
+                                <div class="col-sm-12">
                                     <div class="form-group">
                                         <label>Quantity</label>
-                                        <input class="form-control" placeholder="Quantity" name="quantity"
-                                            id="quantity" type="text" value="">
+                                        <input class="form-control" placeholder="Quantity" name="quantity" id="quantity"
+                                            type="text" value="">
                                     </div>
                                 </div>
 
@@ -132,6 +117,10 @@
             </div>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <script src="js/packages/jquery.min.js"></script>
     <script src="js/custom/common.js"></script>
     <script src="js/custom/manage-product.js"></script>

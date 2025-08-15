@@ -61,6 +61,10 @@
 
 <body>
   <div class="container checkout-container">
+    <button class="btn btn-outline-secondary mb-3" onclick="goBack()">
+      &#8592; Back
+    </button>
+
     <div class="checkout-header">
       <h2>Checkout</h2>
       <p class="text-muted">Review and confirm the sale</p>
@@ -243,6 +247,11 @@
         console.error("Error loading sale data:", err);
       }
     };
+
+    function goBack() {
+      window.history.back();
+    }
+
   </script>
 </body>
 

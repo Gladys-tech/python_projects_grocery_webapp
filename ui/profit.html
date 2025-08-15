@@ -65,6 +65,9 @@
 <body>
 
     <div class="container py-5">
+        <button class="btn btn-outline-secondary mb-3 mt-3 ml-3" onclick="goBack()">
+            &#8592; Back
+        </button>
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <h2 class="header-title">Profit Summary</h2>
 
@@ -106,38 +109,7 @@
             </div>
         </div>
 
-        <!-- <div class="text-end mt-4">
-            <button class="btn btn-calculate" onclick="calculateProfit()">Calculate</button>
-        </div> -->
     </div>
-
-    <!-- <script>
-        const apiUrl = "http://127.0.0.1:5000/getProfitSummary";
-
-        function calculateProfit() {
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const selling = data.total_revenue || 0;
-                    const expenses = data.total_expenses || 0;
-                    const buying = 0; // Optional: Add if you have buying price details stored
-
-                    const netProfit = selling - expenses;
-
-                    document.getElementById("totalSelling").innerText = `UGX ${selling.toLocaleString()}`;
-                    document.getElementById("totalBuying").innerText = `UGX ${buying.toLocaleString()}`; // Placeholder
-                    document.getElementById("totalExpenses").innerText = `UGX ${expenses.toLocaleString()}`;
-                    document.getElementById("netProfit").innerText = `UGX ${netProfit.toLocaleString()}`;
-                })
-                .catch(error => {
-                    console.error("Error fetching profit data:", error);
-                    alert("Failed to load profit data.");
-                });
-        }
-
-        // Auto-calculate on load
-        window.onload = calculateProfit;
-    </script> -->
 
     <script>
         const apiUrl = "http://127.0.0.1:5000/getProfitSummary";
@@ -150,14 +122,23 @@
                 .then(data => {
                     const selling = data.total_revenue || 0;
                     const expenses = data.total_expenses || 0;
-                    const buying = data. total_buying_price || 0; 
+                    const buying = data.total_buying_price || 0;
 
-                    const netProfit = selling - (expenses+ buying);
+                    const netProfit = selling - (expenses + buying);
 
                     document.getElementById("totalSelling").innerText = `UGX ${selling.toLocaleString()}`;
                     document.getElementById("totalBuying").innerText = `UGX ${buying.toLocaleString()}`;
                     document.getElementById("totalExpenses").innerText = `UGX ${expenses.toLocaleString()}`;
-                    document.getElementById("netProfit").innerText = `UGX ${netProfit.toLocaleString()}`;
+                    // document.getElementById("netProfit").innerText = `UGX ${netProfit.toLocaleString()}`;
+                    const netProfitEl = document.getElementById("netProfit");
+                    netProfitEl.innerText = `UGX ${netProfit.toLocaleString()}`;
+
+                    // Change color based on positive/negative
+                    if (netProfit < 0) {
+                        netProfitEl.style.color = "red";
+                    } else {
+                        netProfitEl.style.color = "#28a745"; // green
+                    }
                 })
                 .catch(error => {
                     console.error("Error fetching profit data:", error);
@@ -169,6 +150,10 @@
 
         // Auto-calculate on load
         window.onload = calculateProfit;
+
+        function goBack() {
+            window.location.href = "index.html";
+        }
     </script>
 
 

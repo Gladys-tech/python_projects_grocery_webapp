@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title> GSMS </title>
+    <title> Alpha Stores </title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -18,46 +18,15 @@
 
 <body class="tooltips">
     <div class="container">
-
-        <!-- <div class="header content rows-content-header">
-                <button class="button-menu-mobile show-sidebar">
-                    <i class="fa fa-bars"></i>
-                </button>
-                <div class="navbar navbar-default" role="navigation">
-                    <div class="container">
-
-                        <div class="navbar-collapse collapse">
-                            <ul class="nav navbar-nav visible-lg visible-md limit-chars">
-                                <ul class="breadcrumb">
-                                    <a href="index.html">
-                                        <i class="zmdi zmdi-view-dashboard zmdi-hc-fw" title="Orders"></i>
-                                    </a>
-                                    <a href="manage-product.html">
-                                        <i class="zmdi zmdi-assignment zmdi-hc-fw" title="Products"></i>
-                                    </a>
-                                </ul>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-
         <div class="right content-page">
+            <button class="btn btn-outline-secondary mb-3 mt-3 ml-3" onclick="goBack()">
+                &#8592; Back
+            </button>
             <div class="body content rows scroll-y">
                 <form class="form-horizontal" action="">
                     <div class="box-info full" id="taskFormContainer">
                         <h2>All Transactions</h2>
                         <div class="panel-body pt-0">
-                            <!-- <div class="row mb-4">
-                                    <div class="col-sm-12">
-                                        <a href="order.html" class="btn btn-sm btn-primary pull-right ml-3">
-                                            New Order
-                                        </a>
-                                        <a href="manage-product.html" class="btn btn-sm btn-primary pull-right">
-                                            Manage Products
-                                        </a>
-                                    </div>
-                                </div> -->
                             <div class="row mb-4">
                                 <div class="col-sm-4">
                                     <label for="filterRange">Filter By:</label>
@@ -70,12 +39,22 @@
                                     </select>
                                 </div>
                             </div>
-
+                            <div class="row mb-3">
+                                <div class="col-sm-12">
+                                    <button id="exportOrdersCsv" type="button" class="btn btn-sm btn-success">Export
+                                        CSV</button>
+                                    <button id="exportOrdersExcel" type="button" class="btn btn-sm btn-info">Export
+                                        Excel</button>
+                                    <button id="exportOrdersPdf" type="button" class="btn btn-sm btn-danger">Export
+                                        PDF</button>
+                                </div>
+                            </div>
+                            <div id="transactionTotal" class="mb-2"></div>
                             <table class="table table-bordered">
                                 <thead>
                                     <th>Date</th>
                                     <th>Order Number</th>
-                                    <th>Customer Name</th>
+                                    <th>Cashiers Name</th>
                                     <th>Total Cost</th>
                                     <th>Action</th>
                                 </thead>
@@ -109,6 +88,10 @@
         </div>
     </div>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
 
 <script src="js/packages/jquery.min.js"></script>
 <script src="js/custom/common.js"></script>

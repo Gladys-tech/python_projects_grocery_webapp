@@ -26,7 +26,7 @@ def insert_new_product(connection, product):
         "VALUES (%s, %s, %s, %s, %s)"
     )
     data = (
-        product['product_name'],
+        product['name'],
         product['uom_id'],
         product['price_per_unit'],
         product.get('buying_price', 0),
@@ -42,9 +42,8 @@ def insert_new_product(connection, product):
 def update_product(connection, product):
     cursor = connection.cursor()
     query = ("UPDATE products SET name=%s, uom_id=%s, price_per_unit=%s, buying_price=%s, quantity=%s WHERE product_id=%s")
-    # data = (product['product_name'], product['uom_id'], product['price_per_unit'], product['buying_price'], product['product_id'])
     data = (
-            product['product_name'],
+            product['name'],
             int(product['uom_id']),             # convert to int
             float(product['price_per_unit']),   # convert to float
             float(product['buying_price']),

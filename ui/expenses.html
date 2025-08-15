@@ -46,6 +46,9 @@
 <body>
 
     <div class="container my-4">
+        <button class="btn btn-outline-secondary mb-3" onclick="goBack()">
+            &#8592; Back
+        </button>
         <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Expense Records</h5>
@@ -133,115 +136,7 @@
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- <script>
-        const GET_EXPENSES_URL = "http://127.0.0.1:5000/getExpenses";
-        const ADD_EXPENSE_URL = "http://127.0.0.1:5000/addExpense";
 
-        // Load all expenses when the page loads
-        $(document).ready(function () {
-            loadExpenses();
-        });
-
-        let allExpenses = [];
-
-        $(document).ready(function () {
-            $.get(GET_EXPENSES_URL, function (data) {
-                allExpenses = data || [];
-                renderExpenses(allExpenses);
-            });
-
-            $(".filter-btn").on("click", function () {
-                const filterType = $(this).data("filter");
-                const filtered = filterExpenses(allExpenses, filterType);
-                renderExpenses(filtered);
-            });
-        });
-
-        function filterExpenses(expenses, type) {
-            const now = new Date();
-            return expenses.filter(exp => {
-                const date = new Date(exp.date);
-                switch (type) {
-                    case "daily":
-                        return date.toDateString() === now.toDateString();
-                    case "weekly": {
-                        const dayDiff = (now - date) / (1000 * 60 * 60 * 24);
-                        return dayDiff <= 7 && date.getFullYear() === now.getFullYear();
-                    }
-                    case "monthly":
-                        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-                    case "yearly":
-                        return date.getFullYear() === now.getFullYear();
-                    case "all":
-                    default:
-                        return true;
-                }
-            });
-        }
-
-        // Fetch and render expenses
-        function loadExpenses() {
-            $.get(GET_EXPENSES_URL, function (data) {
-                const tbody = $("#expenseTableBody");
-                tbody.empty();
-                let totalAmount = 0;
-
-                if (!Array.isArray(data)) {
-                    alert("Failed to load expenses.");
-                    return;
-                }
-                data.forEach(expense => {
-                    totalAmount += parseFloat(expense.amount);
-                });
-
-                data.forEach((exp, index) => {
-                    tbody.append(`
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>${exp.date}</td>
-                            <td>${exp.category}</td>
-                            <td>${exp.description}</td>
-                            <td>${parseFloat(exp.amount).toLocaleString()}</td>
-                            <td><span class="text-muted">N/A</span></td>
-                        </tr>
-                    `);
-                    // Display the total
-                    $('#totalExpenses').text(totalAmount.toFixed(2));
-                });
-            });
-        }
-
-        // Submit form to add a new expense
-        $("#expenseForm").on("submit", function (e) {
-            e.preventDefault();
-
-            const payload = {
-                category: $("#expenseCategory").val(),
-                description: $("#expenseDescription").val(),
-                amount: parseFloat($("#expenseAmount").val())
-            };
-
-            if (!payload.category || !payload.description || isNaN(payload.amount)) {
-                alert("Please fill out all fields correctly.");
-                return;
-            }
-
-            $.ajax({
-                url: ADD_EXPENSE_URL,
-                method: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(payload),
-                success: function () {
-                    $("#expenseModal").modal("hide");
-                    $("#expenseForm")[0].reset();
-                    loadExpenses();
-                },
-                error: function () {
-                    alert("Failed to add expense.");
-                }
-            });
-        });
-    </script> -->
     <script>
         const GET_EXPENSES_URL = "http://127.0.0.1:5000/getExpenses";
         const ADD_EXPENSE_URL = "http://127.0.0.1:5000/addExpense";
@@ -351,6 +246,11 @@
                 }
             });
         }
+
+        function goBack() {
+            window.history.back();
+        }
+
     </script>
 
 

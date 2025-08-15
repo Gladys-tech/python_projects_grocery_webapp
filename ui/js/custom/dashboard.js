@@ -1,32 +1,10 @@
-// $(function () {
-//     //Json data by api call for order table
-//     $.get(orderListApiUrl, function (response) {
-//         if (response) {
-//             var table = '';
-//             var totalCost = 0;
-//             $.each(response, function (index, order) {
-//                 totalCost += parseFloat(order.total);
-//                 table += '<tr>' +
-//                     '<td>' + order.datetime + '</td>' +
-//                     '<td>' + order.order_id + '</td>' +
-//                     '<td>' + order.customer_name + '</td>' +
-//                     '<td>' + order.total.toFixed(2) + ' Rs</td>' +
-//                     '<td><a href="order-details.html?order_id=' + order.order_id + '" class="btn btn-sm btn-info">View</a></td>' +
-//                     '</tr>';
-//             });
-//             table += '<tr><td colspan="3" style="text-align: end"><b>Total</b></td><td><b>' + totalCost.toFixed(2) + ' Rs</b></td></tr>';
-//             $("table").find('tbody').empty().html(table);
-//         }
-//     });
-// });
-
 
 let allOrders = [];
 
 function fetchAndRenderOrders() {
     $.get(orderListApiUrl, function (response) {
         if (response) {
-            allOrders = response;
+            allOrders = response.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
             renderTable(allOrders);
         }
     });
@@ -52,12 +30,11 @@ function renderTable(data) {
         tbody.append(row);
     });
 
-    tbody.append(`
-        <tr>
-            <td colspan="3" style="text-align: end"><b>Total</b></td>
-            <td><b>${totalCost.toFixed(2)} Ugx</b></td>
-            <td></td>
-        </tr>
+    // Show total ABOVE the table
+    $("#transactionTotal").html(`
+        <div class="alert alert-primary mb-3" style="text-align: end">
+            <b>Total Transactions : ${totalCost.toFixed(2)} Ugx</b>
+        </div>
     `);
 }
 
@@ -105,3 +82,82 @@ $(function () {
         filterTransactionsByDate(selected);
     });
 });
+
+async function getOrderDetails(orderId) {
+    try {
+        const res = await fetch(`http://localhost:5000/getOrderDetails/${orderId}`);
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error("Error fetching order details:", err);
+        return [];
+    }
+}
+
+async function exportOrdersCombined(format) {
+    let combinedData = [];
+    for (let order of allOrders) {
+        const details = await getOrderDetails(order.order_id);
+        details.forEach(item => {
+            combinedData.push({
+                "Order Date": order.datetime,
+                "Order Number": order.order_id,
+                "Cashiers Name": order.customer_name,
+                "Product": item.product_name,
+                "Unit Price": item.price_per_unit.toFixed(2),
+                "Quantity": item.quantity,
+                "Total Price": parseFloat(item.total_price).toFixed(2)
+            });
+        });
+    }
+    console.log("Combined Data:", combinedData); 
+    if (!combinedData.length) {
+        alert("No data to export!");
+        return;
+    }
+    if (format === "csv") exportCSV(combinedData, "orders_combined.csv");
+    else if (format === "excel") exportExcel(combinedData, "orders_combined.xlsx");
+    else if (format === "pdf") exportPDF(combinedData, "orders_combined.pdf");
+}
+
+// --- Helpers ---
+function exportCSV(data, filename) {
+    const keys = Object.keys(data[0]);
+    const csv = [
+        keys.join(","),
+        ...data.map(row => keys.map(k => row[k]).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+}
+
+function exportExcel(data, filename) {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(data);
+    XLSX.utils.book_append_sheet(wb, ws, "Orders");
+    XLSX.writeFile(wb, filename);
+}
+
+function exportPDF(data, filename) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.autoTable({
+        head: [Object.keys(data[0])],
+        body: data.map(d => Object.values(d))
+    });
+    doc.save(filename);
+}
+
+// --- Button Handlers ---
+$("#exportOrdersCsv").on("click", async () => await exportOrdersCombined("csv"));
+$("#exportOrdersExcel").on("click", async () => await exportOrdersCombined("excel"));
+$("#exportOrdersPdf").on("click", async () => await exportOrdersCombined("pdf"));
+
+
+function goBack() {
+    window.location.href = "index.html";
+}

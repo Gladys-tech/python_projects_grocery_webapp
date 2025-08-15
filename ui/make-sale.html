@@ -70,16 +70,26 @@
 
 <body>
     <div class="container sale-container">
+        <button class="btn btn-outline-secondary mb-3" onclick="goBack()">
+            &#8592; Back
+        </button>
         <div class="sale-header">
             <h2>Make a Sale</h2>
             <p class="text-muted">Search or scan product to start</p>
         </div>
 
         <!-- Search / Scan -->
-        <div class="mb-4">
+        <!-- <div class="mb-4">
             <input type="text" class="form-control" id="searchProduct"
                 placeholder="Search product name or scan barcode" />
+        </div> -->
+        <!-- Search / Scan -->
+        <div class="mb-4 position-relative">
+            <input type="text" class="form-control" id="searchProduct" placeholder="Search product name or scan barcode"
+                autocomplete="off" />
+            <div id="suggestions" class="list-group position-absolute w-100" style="z-index: 1000;"></div>
         </div>
+
 
         <!-- Sale Table -->
         <div class="table-responsive mb-4">
@@ -120,20 +130,61 @@
         }
 
         // Search bar logic
+        // document.getElementById('searchProduct').addEventListener('input', function () {
+        //     const query = this.value.trim().toLowerCase();
+        //     if (query.length >= 3) {
+        //         const matched = productList.find(p => p.name.toLowerCase() === query);
+        //         if (matched) {
+        //             addProductToSale({
+        //                 product_id: matched.product_id,
+        //                 name: matched.name,
+        //                 price: matched.price_per_unit
+        //             });
+        //             this.value = ''; // Clear input
+        //         }
+        //     }
+        // });
+
+        // Search bar logic with suggestions
         document.getElementById('searchProduct').addEventListener('input', function () {
             const query = this.value.trim().toLowerCase();
-            if (query.length >= 3) {
-                const matched = productList.find(p => p.name.toLowerCase() === query);
-                if (matched) {
-                    addProductToSale({
-                        product_id: matched.product_id,
-                        name: matched.name,
-                        price: matched.price_per_unit
-                    });
-                    this.value = ''; // Clear input
-                }
+            const suggestionsEl = document.getElementById('suggestions');
+            suggestionsEl.innerHTML = '';
+
+            if (query.length > 0) {
+                // Filter products starting with typed letters
+                const matched = productList.filter(p =>
+                    p.name.toLowerCase().startsWith(query)
+                );
+
+                // Show suggestions
+                matched.forEach(product => {
+                    const item = document.createElement('a');
+                    item.href = "#";
+                    item.className = "list-group-item list-group-item-action";
+                    item.textContent = product.name;
+                    item.onclick = (e) => {
+                        e.preventDefault();
+                        addProductToSale({
+                            product_id: product.product_id,
+                            name: product.name,
+                            price: product.price_per_unit
+                        });
+                        document.getElementById('searchProduct').value = '';
+                        suggestionsEl.innerHTML = ''; // Clear suggestions
+                    };
+                    suggestionsEl.appendChild(item);
+                });
             }
         });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!document.getElementById('searchProduct').contains(e.target)) {
+                document.getElementById('suggestions').innerHTML = '';
+            }
+        });
+
 
         function addProductToSale(product) {
             const index = saleItems.findIndex(item => item.product_id === product.product_id);
@@ -195,6 +246,11 @@
         window.onload = async () => {
             await fetchProducts();
         };
+
+        function goBack() {
+            window.history.back();
+        }
+
     </script>
 </body>
 

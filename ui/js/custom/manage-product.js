@@ -13,7 +13,8 @@ $(function () {
                     '" data-name="' + product.name +
                     '" data-unit="' + product.uom_id +
                     '" data-price="' + product.price_per_unit +
-                    '" data-buying-price="' + (product.buying_price || 0) + '">' +
+                    // '" data-buying-price="' + (product.buying_price || 0) + '">' +
+                    '" data-buying-price="' + (product.buying_price || 0) +
                     '" data-quantity="' + (product.quantity || 0) + '">' +
                     '<td>' + product.name + '</td>' +
                     '<td>' + product.uom_name + '</td>' +
@@ -73,7 +74,8 @@ $("#saveProduct").on("click", function () {
     var data = $("#productForm").serializeArray();
     var requestPayload = {
         product_id: null,
-        product_name: null,
+        // product_name: null,
+        name: null,
         uom_id: null,
         price_per_unit: null,
         buying_price: null,
@@ -85,8 +87,11 @@ $("#saveProduct").on("click", function () {
             case 'product_id':
                 requestPayload.product_id = element.value;
                 break;
+            // case 'name':
+            //     requestPayload.product_name = element.value;
+            //     break;
             case 'name':
-                requestPayload.product_name = element.value;
+                requestPayload.name = element.value;   // use 'name' to match backend
                 break;
             case 'uoms':
                 requestPayload.uom_id = element.value;
@@ -113,7 +118,7 @@ $("#saveProduct").on("click", function () {
     // ✅ LOG which API endpoint and method are used
     console.log("API Method:", method);
     console.log("API URL:", apiUrl);
-    console.log("Payload:", requestPayload);
+    // console.log("Payload:", requestPayload);
 
     callApi(method, apiUrl, {
         'data': JSON.stringify(requestPayload)
@@ -152,3 +157,48 @@ productModal.on('show.bs.modal', function () {
         }
     });
 });
+
+function exportTableToCSV(filename) {
+    var csv = [];
+    var rows = $("table tr");
+
+    rows.each(function () {
+        var row = [];
+        $(this).find("th, td").each(function () {
+            row.push($(this).text().replace(/,/g, "")); // remove commas to avoid breaking CSV
+        });
+        csv.push(row.join(","));
+    });
+
+    var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+    var downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+}
+
+function exportTableToExcel(filename) {
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.table_to_sheet($("table")[0]);
+    XLSX.utils.book_append_sheet(wb, ws, "Products");
+    XLSX.writeFile(wb, filename);
+}
+
+function exportTableToPDF(filename) {
+    const { jsPDF } = window.jspdf;
+    var doc = new jsPDF();
+    doc.autoTable({ html: "table" });
+    doc.save(filename);
+}
+
+// Button click handlers
+$("#exportCsv").on("click", function () { exportTableToCSV("products.csv"); });
+$("#exportExcel").on("click", function () { exportTableToExcel("products.xlsx"); });
+$("#exportPdf").on("click", function () { exportTableToPDF("products.pdf"); });
+
+function goBack() {
+    window.history.back();
+}

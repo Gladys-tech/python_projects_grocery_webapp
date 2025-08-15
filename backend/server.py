@@ -67,14 +67,7 @@ def insert_order():
         # Log full exception server-side for debugging
         print("Unexpected error inserting order:", e)
         return jsonify({'success': False, 'error': 'Internal server error'}), 500
-# def insert_order():
-#     request_payload = json.loads(request.form['data'])
-#     order_id = orders_dao.insert_order(connection, request_payload)
-#     response = jsonify({
-#         'order_id': order_id
-#     })
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#     return response
+
 
 @app.route('/getOrderDetails/<int:order_id>', methods=['GET'])
 def get_order_details(order_id):
@@ -90,16 +83,25 @@ def get_order_details(order_id):
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
+
 @app.route('/editProduct', methods=['PUT'])
 def edit_product():
-    # request_payload = json.loads(request.form['data'])
-    request_payload = request.get_json()
-    updated_id = products_dao.update_product(connection, request_payload)
-    response = jsonify({
-        'updated_id': updated_id
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    try:
+        request_payload = request.get_json()
+        print("Received payload:", request_payload)
+        # then parse it
+        if 'data' in request_payload:
+            request_payload = json.loads(request_payload['data'])
+        print("Parsed payload:", request_payload)
+        updated_id = products_dao.update_product(connection, request_payload)
+        response = jsonify({"status": "success", "updated_id": updated_id})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 
 @app.route('/deleteProduct', methods=['POST'])
 def delete_product():
@@ -127,12 +129,6 @@ def get_expenses():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-# @app.route('/getProfitSummary', methods=['GET'])
-# def get_profit_summary():
-#     summary = profits_dao.calculate_profit(connection)
-#     response = jsonify(summary)
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#     return response
 @app.route('/getProfitSummary', methods=['GET'])
 def get_profit_summary():
     filter_option = request.args.get('filter', 'daily')  # default to daily
