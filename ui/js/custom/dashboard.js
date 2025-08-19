@@ -1,11 +1,14 @@
 
 let allOrders = [];
+let filteredOrders = [];
 
 function fetchAndRenderOrders() {
     $.get(orderListApiUrl, function (response) {
         if (response) {
             allOrders = response.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-            renderTable(allOrders);
+            // renderTable(allOrders);
+            filteredOrders = [...allOrders]; // default to all
+            renderTable(filteredOrders);
         }
     });
 }
@@ -40,7 +43,8 @@ function renderTable(data) {
 
 function filterTransactionsByDate(filter) {
     const today = new Date();
-    const filtered = allOrders.filter(order => {
+    // const filtered = allOrders.filter(order => {
+    filteredOrders = allOrders.filter(order => {
         const orderDate = new Date(order.datetime);
 
         switch (filter) {
@@ -63,7 +67,8 @@ function filterTransactionsByDate(filter) {
         }
     });
 
-    renderTable(filtered);
+    // renderTable(filtered);
+    renderTable(filteredOrders);
 }
 
 function isSameDay(d1, d2) {
@@ -96,7 +101,7 @@ async function getOrderDetails(orderId) {
 
 async function exportOrdersCombined(format) {
     let combinedData = [];
-    for (let order of allOrders) {
+    for (let order of filteredOrders) {
         const details = await getOrderDetails(order.order_id);
         details.forEach(item => {
             combinedData.push({
@@ -110,7 +115,7 @@ async function exportOrdersCombined(format) {
             });
         });
     }
-    console.log("Combined Data:", combinedData); 
+    console.log("Combined Data:", combinedData);
     if (!combinedData.length) {
         alert("No data to export!");
         return;

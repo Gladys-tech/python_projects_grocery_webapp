@@ -105,6 +105,15 @@
                     message.style.color = "red";
                 });
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const role = localStorage.getItem("role");
+            if (role !== "admin") {
+                // Not admin → block access
+                alert("Only admins can access the signup page.");
+                window.location.href = "login.html";
+            }
+        });
     </script>
 
 </body>

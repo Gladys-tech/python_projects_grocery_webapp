@@ -32,12 +32,34 @@
             margin-bottom: 15px;
         }
 
-        .print-btn {
-            float: right;
+        .report-header h5 {
+            margin: 0;
+            padding: 10px;
+            font-weight: bold;
+            color: #2196f3;
+            background-color: #fff;
         }
 
         .filter-select {
             max-width: 200px;
+        }
+
+        .custom-back-btn {
+            background-color: #2196f3;
+            /* Blue background */
+            color: black;
+            /* Black arrow/text */
+            border: none;
+            /* Remove default border */
+            font-weight: bold;
+            /* Make arrow bold */
+        }
+
+        .custom-back-btn:hover {
+            background-color: #1976d2;
+            /* Darker blue on hover */
+            color: black;
+            /* Keep text black */
         }
     </style>
 </head>
@@ -46,7 +68,9 @@
 
     <div class="container">
         <h2 class="mb-4 text-center">Business Reports</h2>
-
+        <button class="btn custom-back-btn mb-3 mt-3 ml-3" onclick="goBack()">
+            &#8592; Back
+        </button>
         <ul class="nav nav-tabs" id="reportTabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="sales-tab" data-toggle="tab" href="#sales" role="tab">Sales Report</a>
@@ -54,9 +78,6 @@
             <li class="nav-item">
                 <a class="nav-link" id="inventory-tab" data-toggle="tab" href="#inventory" role="tab">Inventory
                     Report</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="credit-tab" data-toggle="tab" href="#credit" role="tab">Credit Report</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="staff-tab" data-toggle="tab" href="#staff" role="tab">Staff Activity Report</a>
@@ -69,16 +90,23 @@
             <div class="tab-pane fade show active" id="sales" role="tabpanel">
                 <div class="report-header">
                     <h5>Sales Report</h5>
-                    <div>
+                    <div class="d-flex">
                         <select class="form-control filter-select" id="salesFilter">
                             <option value="daily">Daily</option>
                             <option value="weekly">Weekly</option>
                             <option value="monthly">Monthly</option>
                             <option value="yearly">Yearly</option>
                         </select>
-                        <div class="d-flex">
-                            <button class="btn btn-secondary mr-2" onclick="printSection('sales')">Print</button>
-                            <button class="btn btn-success" onclick="downloadPDF('sales')">Download PDF</button>
+                        <div class="dropdown ml-3">
+                            <button class="btn btn-success dropdown-toggle" type="button" id="downloadMenu"
+                                data-toggle="dropdown">
+                                Download
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#" onclick="downloadReport('sales','pdf')">PDF</a>
+                                <a class="dropdown-item" href="#" onclick="downloadReport('sales','csv')">CSV</a>
+                                <a class="dropdown-item" href="#" onclick="downloadReport('sales','excel')">Excel</a>
+                            </div>
                         </div>
 
                     </div>
@@ -96,41 +124,19 @@
             <div class="tab-pane fade" id="inventory" role="tabpanel">
                 <div class="report-header">
                     <h5>Inventory Report</h5>
-                    <div class="d-flex">
-                        <button class="btn btn-secondary mr-2" onclick="printSection('inventory')">Print</button>
-                        <button class="btn btn-success" onclick="downloadPDF('inventory')">Download PDF</button>
+                    <div class="dropdown ml-3">
+                        <button class="btn btn-success dropdown-toggle" type="button" id="downloadMenu"
+                            data-toggle="dropdown">
+                            Download
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#" onclick="downloadReport('inventory','pdf')">PDF</a>
+                            <a class="dropdown-item" href="#" onclick="downloadReport('inventory','csv')">CSV</a>
+                            <a class="dropdown-item" href="#" onclick="downloadReport('inventory','excel')">Excel</a>
+                        </div>
                     </div>
                 </div>
-                <!-- <div id="inventoryContent" class="card p-3">
-                    <ul>
-                        <li><strong>Fast Moving Products:</strong> Product A, Product B</li>
-                        <li><strong>Slow Moving Products:</strong> Product C</li>
-                        <li><strong>Out of Stock:</strong> Product D</li>
-                        <li><strong>Other Notes:</strong> Summary info here...</li>
-                    </ul>
-                </div> -->
                 <div id="inventoryContent" class="card p-3">
-                    Loading...
-                </div>
-            </div>
-
-            <!-- Credit Report -->
-            <div class="tab-pane fade" id="credit" role="tabpanel">
-                <div class="report-header">
-                    <h5>Credit Report</h5>
-                    <div class="d-flex">
-                        <button class="btn btn-secondary mr-2" onclick="printSection('credit')">Print</button>
-                        <button class="btn btn-success" onclick="downloadPDF('credit')">Download PDF</button>
-                    </div>
-                </div>
-                <!-- <div id="creditContent" class="card p-3">
-                    <ul>
-                        <li>John Doe – UGX 50,000 – <em>Follow up 5/July</em></li>
-                        <li>Mary Jane – UGX 30,000 – <em>Follow up 6/July</em></li>
-                        <li>Total Owed: UGX 80,000</li>
-                    </ul>
-                </div> -->
-                <div id="creditContent" class="card p-3">
                     Loading...
                 </div>
             </div>
@@ -140,8 +146,7 @@
                 <div class="report-header">
                     <h5>Staff Activity Report</h5>
                     <div class="d-flex">
-                        <button class="btn btn-secondary mr-2" onclick="printSection('staff')">Print</button>
-                        <button class="btn btn-success" onclick="downloadPDF('staff')">Download PDF</button>
+                        <button class="btn btn-success ml-3" onclick="downloadPDF('staff')">Download</button>
                     </div>
                 </div>
                 <!-- <div id="staffContent" class="card p-3">
@@ -158,7 +163,14 @@
 
         </div>
     </div>
+    <!-- jQuery (required for Bootstrap 4) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
+    <!-- Popper.js (required for dropdowns, tooltips, etc.) -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+    <!-- Bootstrap 4 JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         function fetchSalesReport() {
@@ -181,38 +193,48 @@
 
         document.getElementById("salesFilter").addEventListener("change", fetchSalesReport);
         window.onload = fetchSalesReport;
-        // window.onload = function () {
-        //     fetchSalesReport();
-        //     fetchInventoryReport();
-        //     fetchCreditReport();
-        //     fetchStaffReport();
-        // };
 
-        // function fetchInventoryReport() {
-        //     fetch("http://127.0.0.1:5000/getInventoryReport")
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             document.getElementById("inventoryContent").innerHTML = `
-        //         <ul>
-        //             <li><strong>Fast Moving Products:</strong> ${data.fast_moving.join(', ')}</li>
-        //             <li><strong>Slow Moving Products:</strong> ${data.slow_moving.join(', ')}</li>
-        //             <li><strong>Out of Stock:</strong> ${data.out_of_stock.join(', ')}</li>
-        //         </ul>`;
-        //         });
-        // }
 
-        // function fetchCreditReport() {
-        //     fetch("http://127.0.0.1:5000/getCreditReport")
-        //         .then(res => res.json())
-        //         .then(data => {
-        //             const listItems = data.credits.map(c =>
-        //                 `<li>${c.customer_name} – UGX ${c.amount_owed} – <em>Follow up ${c.follow_up_date}</em></li>`
-        //             ).join("");
-        //             document.getElementById("creditContent").innerHTML = `
-        //         <ul>${listItems}<li>Total Owed: UGX ${data.total_owed}</li></ul>`;
-        //         });
-        // }
+        // API URL for fetching product list
+        const productListApiUrl = 'http://127.0.0.1:5000/getProducts';
+        function fetchInventoryReport() {
+            fetch(productListApiUrl)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Inventory API data:", data); // <-- log the data to console
 
+                    if (!data || data.length === 0) {
+                        document.getElementById("inventoryContent").innerHTML = "<p>No products found.</p>";
+                        return;
+                    }
+
+                    // Categorize products dynamically
+                    const outOfStock = data.filter(p => p.quantity === 0).map(p => p.name);
+                    const slowMoving = data.filter(p => p.quantity > 0 && p.quantity <= 20).map(p => p.name);
+                    const fastMoving = data.filter(p => p.quantity > 20).map(p => p.name);
+
+
+                    document.getElementById("inventoryContent").innerHTML = `
+                <ul>
+                    <li><strong>Fast Moving Products:</strong> ${fastMoving.join(', ') || 'None'}</li>
+                    <li><strong>Slow Moving Products:</strong> ${slowMoving.join(', ') || 'None'}</li>
+                    <li><strong>Out of Stock Products:</strong> ${outOfStock.join(', ') || 'None'}</li>
+                    <li><strong>Total Number Of Products:</strong> ${data.length}</li>
+                </ul>`;
+                })
+                .catch(error => {
+                    console.error("Error fetching inventory report:", error);
+                    document.getElementById("inventoryContent").innerHTML = "<p>Failed to load inventory report.</p>";
+                });
+        }
+        // Fetch inventory report when the tab is shown
+        $('#inventory-tab').on('shown.bs.tab', function () {
+            fetchInventoryReport();
+        });
+
+        function goBack() {
+            window.location.href = "index.html";
+        }
         // function fetchStaffReport() {
         //     fetch("http://127.0.0.1:5000/getStaffReport")
         //         .then(res => res.json())
@@ -229,72 +251,52 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        function printSection(id) {
-            const content = document.getElementById(id + 'Content').innerHTML;
-            const win = window.open('', '', 'width=900,height=700');
-
-            const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Print Report</title>
-            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-            <style>
-                body { font-family: 'Segoe UI', sans-serif; padding: 20px; }
-            </style>
-        </head>
-        <body>
-            ${content}
-            <script>
-                window.onload = function() {
-                    window.print();
-                    setTimeout(function() { window.close(); }, 100);
-                };
-            <\/script>
-        </body>
-        </html>
-        `;
-
-            win.document.write(html);
-            win.document.close();
-        }
-
-        function downloadPDF(id) {
-            console.log("Starting PDF download for section:", id);
-
+        function downloadReport(id, type) {
             const element = document.getElementById(id + 'Content');
             if (!element) {
-                console.error("Element not found:", id + 'Content');
-                alert("Content not found for PDF generation.");
+                alert("Content not found.");
                 return;
             }
 
-            console.log("Element found. Preparing options...");
+            // Get the heading text dynamically
+            const headingElement = document.querySelector(`#${id} .report-header h5`);
+            const headingText = headingElement ? headingElement.innerText : '';
 
-            const opt = {
-                margin: 0.5,
-                filename: `${id}_report.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
+            if (type === 'pdf') {
+                // Clone the content and prepend heading
+                const cloned = element.cloneNode(true);
+                const heading = document.createElement('h3');
+                heading.innerText = headingText;
+                heading.style.textAlign = 'center';
+                heading.style.marginBottom = '20px';
+                cloned.prepend(heading);
 
-            console.log("Options set. Generating PDF...");
+                const opt = {
+                    margin: 0.5,
+                    filename: `${id}_report.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf().from(cloned).set(opt).save();
 
-            html2pdf().from(element).set(opt).save()
-                .then(() => {
-                    console.log("PDF successfully downloaded.");
-                })
-                .catch((error) => {
-                    console.error("PDF generation failed:", error);
-                    alert("An error occurred while downloading the PDF.");
+            } else if (type === 'csv' || type === 'excel') {
+                // Grab plain text (one line per <p>)
+                const rows = [`${headingText}`]; // add heading as first row
+                [...element.querySelectorAll("p")].forEach(p => {
+                    rows.push(p.innerText.replace(/:/, ","));
                 });
+
+                let csvContent = rows.join("\n");
+                let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                let link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `${id}_report.${type === 'excel' ? 'xls' : 'csv'}`;
+                link.click();
+            }
         }
     </script>
 
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 
 </html>

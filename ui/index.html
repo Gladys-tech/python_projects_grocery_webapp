@@ -103,6 +103,13 @@
       border-radius: 0.5rem;
     }
 
+    .username-display {
+      font-size: 20px !important;
+      font-weight: 700 !important;
+      color: #2c3e50 !important;
+      text-transform: uppercase;
+    }
+
     @media (max-width: 576px) {
       .dashboard-card {
         padding: 25px 15px;
@@ -152,7 +159,12 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
             <li>
-              <h6 class="dropdown-header text-dark fw-semibold username-display">Username</h6>
+              <h4 class="dropdown-header text-dark fw-semibold username-display">Username</h4>
+            </li>
+            <li>
+              <ul id="adminMenu">
+                <!-- Normal menu items here -->
+              </ul>
             </li>
             <li>
               <hr class="dropdown-divider" />
@@ -247,6 +259,14 @@
       localStorage.clear();
       window.location.href = 'login.html';
     }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const role = localStorage.getItem("role");
+      if (role === "admin") {
+        const adminMenu = document.getElementById("adminMenu");
+        adminMenu.innerHTML += `<li><a href="signup.html">Add Cashier</a></li>`;
+      }
+    });
   </script>
 
   <!-- JS Dependencies -->
