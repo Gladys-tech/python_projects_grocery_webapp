@@ -35,13 +35,35 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="row mb-3">
+                        <!-- <div class="row mb-3">
                             <div class="col-sm-12">
                                 <button id="exportCsv" class="btn btn-sm btn-success">Export CSV</button>
                                 <button id="exportExcel" class="btn btn-sm btn-info">Export Excel</button>
                                 <button id="exportPdf" class="btn btn-sm btn-danger">Export PDF</button>
                             </div>
+                        </div> -->
+                        <div class="row mb-3">
+                            <div class="col-sm-12">
+                                <div class="btn-group pull-left">
+                                    <button type="button" class="btn btn-sm btn-success dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        Export
+                                    </button>
+                                    <div class="dropdown-menu p-0">
+                                        <div class="dropdown-item px-3 py-2 d-flex align-items-center" id="exportCsv">
+                                            <i class="zmdi zmdi-file-text mr-2 text-success"></i> CSV
+                                        </div>
+                                        <div class="dropdown-item px-3 py-2 d-flex align-items-center" id="exportExcel">
+                                            <i class="zmdi zmdi-file mr-2 text-info"></i> Excel
+                                        </div>
+                                        <div class="dropdown-item px-3 py-2 d-flex align-items-center" id="exportPdf">
+                                            <i class="zmdi zmdi-file-plus mr-2 text-danger"></i> PDF
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
                         <table class="table table-bordered">
                             <thead>
                                 <th>Name</th>

@@ -158,9 +158,40 @@ function exportPDF(data, filename) {
 }
 
 // --- Button Handlers ---
-$("#exportOrdersCsv").on("click", async () => await exportOrdersCombined("csv"));
-$("#exportOrdersExcel").on("click", async () => await exportOrdersCombined("excel"));
-$("#exportOrdersPdf").on("click", async () => await exportOrdersCombined("pdf"));
+// $("#exportOrdersCsv").on("click", async () => await exportOrdersCombined("csv"));
+// $("#exportOrdersExcel").on("click", async () => await exportOrdersCombined("excel"));
+// $("#exportOrdersPdf").on("click", async () => await exportOrdersCombined("pdf"));
+
+function showDownloadAlert(type) {
+    let fileType = type.toUpperCase();
+    $("#downloadAlert")
+        .html(`<strong>Downloading!</strong> Preparing your ${fileType} file... 
+           <button type="button" class="close" onclick="$('#downloadAlert').hide();">
+             <span>&times;</span>
+           </button>`)
+        .fadeIn();
+
+    // auto-hide after 3 seconds
+    setTimeout(() => {
+        $("#downloadAlert").fadeOut();
+    }, 3000);
+}
+
+// --- Button Handlers with alert ---
+$("#exportOrdersCsv").on("click", async () => {
+    showDownloadAlert("csv");
+    await exportOrdersCombined("csv");
+});
+
+$("#exportOrdersExcel").on("click", async () => {
+    showDownloadAlert("excel");
+    await exportOrdersCombined("excel");
+});
+
+$("#exportOrdersPdf").on("click", async () => {
+    showDownloadAlert("pdf");
+    await exportOrdersCombined("pdf");
+});
 
 
 function goBack() {

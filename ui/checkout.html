@@ -60,10 +60,12 @@
 </head>
 
 <body>
+  <!-- Navbar placeholder -->
+  <div id="navbar"></div>
   <div class="container checkout-container">
-    <button class="btn btn-outline-secondary mb-3" onclick="goBack()">
+    <!-- <button class="btn btn-outline-secondary mb-3" onclick="goBack()">
       &#8592; Back
-    </button>
+    </button> -->
 
     <div class="checkout-header">
       <h2>Checkout</h2>
@@ -248,10 +250,15 @@
       }
     };
 
-    function goBack() {
-      window.history.back();
-    }
-
+    // function goBack() {
+    //   window.history.back();
+    // }
+    // Load navbar.html into placeholder
+    fetch("navbar.html")
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById("navbar").innerHTML = data;
+      });
   </script>
 </body>
 

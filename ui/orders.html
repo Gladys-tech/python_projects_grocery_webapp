@@ -49,6 +49,7 @@
                                         PDF</button>
                                 </div>
                             </div>
+
                             <div id="transactionTotal" class="mb-2"></div>
                             <table class="table table-bordered">
                                 <thead>
@@ -86,6 +87,14 @@
                 </div>
             </div>
         </div>
+        <div id="downloadAlert" class="alert alert-info alert-dismissible fade show" role="alert"
+            style="display:none; position:fixed; top:20px; right:20px; z-index:1050;">
+            <strong>Downloading!</strong> Your file is being prepared...
+            <button type="button" class="close" onclick="$('#downloadAlert').hide();">
+                <span>&times;</span>
+            </button>
+        </div>
+
     </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>

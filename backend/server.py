@@ -204,6 +204,38 @@ def login():
     else:
         return jsonify({'success': False, 'error': 'Invalid credentials'})
 
+@app.route('/changePassword', methods=['POST'])
+def change_password():
+    data = request.get_json()
+    username = data.get('username')
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    user = cursor.fetchone()
+
+    if not user:
+        cursor.close()
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+
+    # Verify current password
+    if not bcrypt.check_password_hash(user['password'], current_password):
+        cursor.close()
+        return jsonify({'success': False, 'error': 'Current password is incorrect'}), 400
+
+    # Hash new password
+    hashed = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+    try:
+        cursor.execute("UPDATE users SET password = %s WHERE username = %s", (hashed, username))
+        connection.commit()
+        cursor.close()
+        return jsonify({'success': True, 'message': 'Password updated successfully'})
+    except Exception as e:
+        cursor.close()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 if __name__ == "__main__":
     print("Starting Python Flask Server For Grocery Store Management System")

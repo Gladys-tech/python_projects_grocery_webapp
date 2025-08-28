@@ -119,6 +119,17 @@
     background: #ffffff;
 }
 
+.dropdown-item {
+  cursor: pointer;
+  text-decoration: none !important; /* removes underline */
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1; /* subtle hover effect */
+  text-decoration: none;      /* keep underline removed */
+}
+
+
 @media (max-width: 767px) {
 
     #sidebar-menu-v2 {
