@@ -9,10 +9,7 @@
 
   <style>
     body {
-      background-image: url('./images/bg.jpg');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
+      background-color: #fff;
       font-family: 'Segoe UI', sans-serif;
       padding: 0;
       margin: 0;
@@ -63,10 +60,6 @@
   <!-- Navbar placeholder -->
   <div id="navbar"></div>
   <div class="container checkout-container">
-    <!-- <button class="btn btn-outline-secondary mb-3" onclick="goBack()">
-      &#8592; Back
-    </button> -->
-
     <div class="checkout-header">
       <h2>Checkout</h2>
       <p class="text-muted">Review and confirm the sale</p>
@@ -250,15 +243,41 @@
       }
     };
 
-    // function goBack() {
-    //   window.history.back();
-    // }
-    // Load navbar.html into placeholder
+    const user = localStorage.getItem("username");
+    const role = localStorage.getItem("role");
+
+    if (!user || !role) {
+      window.location.href = "login.html";
+    }
+
+    // Load Navbar dynamically
     fetch("navbar.html")
       .then(res => res.text())
       .then(data => {
         document.getElementById("navbar").innerHTML = data;
+
+        // Update user info
+        document.querySelectorAll(".username-display").forEach(el => el.innerText = user);
+
+        // Hide admin links if cashier
+        if (role === "cashier") {
+          document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
+        }
+
+        // Add admin-only menu item
+        if (role === "admin") {
+          const adminMenu = document.getElementById("adminMenu");
+          if (adminMenu) {
+            adminMenu.innerHTML += `<li><a class="dropdown-item" href="signup.html">Add Cashier</a></li>`;
+          }
+        }
       });
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
   </script>
 </body>
 

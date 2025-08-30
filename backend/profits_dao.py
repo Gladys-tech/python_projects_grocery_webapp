@@ -1,29 +1,3 @@
-# # profit_dao.py
-
-# def calculate_profit(connection):
-#     cursor = connection.cursor(dictionary=True)
-
-#     # Get total revenue from orders
-#     cursor.execute("SELECT SUM(total) AS total_revenue FROM orders")
-#     revenue_result = cursor.fetchone()
-#     total_revenue = revenue_result['total_revenue'] if revenue_result['total_revenue'] else 0
-
-#     # Get total expenses from expenses table
-#     cursor.execute("SELECT SUM(amount) AS total_expenses FROM expenses")
-#     expenses_result = cursor.fetchone()
-#     total_expenses = expenses_result['total_expenses'] if expenses_result['total_expenses'] else 0
-
-#     # Calculate profit
-#     profit = total_revenue - total_expenses
-
-#     cursor.close()
-
-#     return {
-#         'total_revenue': total_revenue,
-#         'total_expenses': total_expenses,
-#         'profit': profit
-#     }
-
 from datetime import datetime, timedelta
 
 def calculate_profit(connection, filter_option='daily'):

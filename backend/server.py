@@ -145,27 +145,6 @@ def get_sales_report_route():
     response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
-# @app.route('/getInventoryReport', methods=['GET'])
-# def inventory_report():
-#     data = reports_dao.get_inventory_report(connection)
-#     response = jsonify(data)
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#     return response
-
-# @app.route('/getCreditReport', methods=['GET'])
-# def credit_report():
-#     data = reports_dao.get_credit_report(connection)
-#     response = jsonify(data)
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#     return response
-
-# @app.route('/getStaffReport', methods=['GET'])
-# def staff_report():
-#     data = reports_dao.get_staff_activity_report(connection)
-#     response = jsonify(data)
-#     response.headers.add('Access-Control-Allow-Origin', '*')
-#     return response
-
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
