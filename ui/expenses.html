@@ -11,15 +11,15 @@
 
     <style>
         body {
-          background-color: #fff;
+            background-color: #fff;
             font-family: 'Segoe UI', sans-serif;
             padding: 0;
             margin: 0;
         }
 
         .card-header {
-            background-color: #343a40;
-            color: #fff;
+            background-color: white;
+            color: black;
         }
 
         .btn-primary {
@@ -37,13 +37,25 @@
                 overflow-x: auto;
             }
         }
+
+        .custom-back-btn {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+
+        .custom-back-btn:hover {
+            background-color: #1976d2;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="container my-4">
-        <button class="btn btn-outline-secondary mb-3" onclick="goBack()">
+        <button class="btn custom-back-btn mb-3 mt-3 ml-3" onclick="goBack()">
             &#8592; Back
         </button>
         <div class="card shadow-sm">

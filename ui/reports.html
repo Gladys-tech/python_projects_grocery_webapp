@@ -43,20 +43,14 @@
 
         .custom-back-btn {
             background-color: #2196f3;
-            /* Blue background */
-            color: black;
-            /* Black arrow/text */
+            color: white;
             border: none;
-            /* Remove default border */
             font-weight: bold;
-            /* Make arrow bold */
         }
 
         .custom-back-btn:hover {
             background-color: #1976d2;
-            /* Darker blue on hover */
-            color: black;
-            /* Keep text black */
+            color: white;
         }
     </style>
 </head>
@@ -64,10 +58,10 @@
 <body>
 
     <div class="container">
-        <h2 class="mb-4 text-center">Business Reports</h2>
         <button class="btn custom-back-btn mb-3 mt-3 ml-3" onclick="goBack()">
             &#8592; Back
         </button>
+        <h2 class="mb-4 text-center">Business Reports</h2>
         <ul class="nav nav-tabs" id="reportTabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="sales-tab" data-toggle="tab" href="#sales" role="tab">Sales Report</a>
